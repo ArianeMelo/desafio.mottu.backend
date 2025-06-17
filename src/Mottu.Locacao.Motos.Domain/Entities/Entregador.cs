@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Mottu.Locacao.Motos.Domain.Enum;
 
 namespace Mottu.Locacao.Motos.Domain.Entities
 {
-    public class Entregador
+    public class Entregador : Entity
     {
         public string Identificador { get; set; }
         public string Nome { get; set; }
         public string Cnpj { get; set; }
-        public string DataNascimento { get; set; }
+        public DateTime DataNascimento { get; set; }
         public string NumeroCnh { get; set; }
-        public string TipoCnh { get; set; }
+        public int TipoCnh { get; set; }
         public string ImagemCnh { get; set; }
 
-        public Entregador(string identificador, string nome, string cnpj, string dataNascimento, string numeroCnh, string tipoCnh, string imagemCnh)
+        public Entregador(string identificador, string nome, string cnpj, DateTime dataNascimento, string numeroCnh, int tipoCnh, string imagemCnh)
         {
             Identificador = identificador;
             Nome = nome;
@@ -26,7 +22,12 @@ namespace Mottu.Locacao.Motos.Domain.Entities
             TipoCnh = tipoCnh;
             ImagemCnh = imagemCnh;
         }
+        public Entregador()
+        {
+            
+        }
 
-       
+        public bool CategoriaCnhA()
+            => TipoCnh.Equals((int)CategoriaCnh.A);
     }
 }

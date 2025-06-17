@@ -21,7 +21,7 @@ namespace Mottu.Locacao.Motos.Api.Middleware
             }
             catch (Exception ex)
             {
-                //_logger.LogError(string.Format("ExceptionHandlerMiddleware : {0}", ex));
+                _logger.LogError(string.Format("ExceptionHandlerMiddleware : {0}", ex));
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 await context.Response.WriteAsJsonAsync(

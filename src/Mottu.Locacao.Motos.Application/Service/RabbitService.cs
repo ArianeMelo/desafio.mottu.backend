@@ -43,7 +43,7 @@ namespace Mottu.Locacao.Motos.Application.Service
                 {
                     var evento = JsonConvert.DeserializeObject<MotoCadastradaEvent>(mensagem);
                     Console.WriteLine(mensagem);
-                    consume(evento.Placa, evento.Ano);
+                    consume(evento!.Placa, evento.Ano);
                 }
             };
 

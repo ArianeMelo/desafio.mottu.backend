@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Mottu.Locacao.Motos.Domain.Interface.Service;
+using Newtonsoft.Json;
 
 namespace Mottu.Locacao.Motos.Domain.Notification
 {
-    public class NotificacaoDominioHandler
+    public class NotificacaoDominioHandler : Interface.Service.INotificacaoDominioHandler
     {
         private readonly List<NotificacaoDominio> _notifications;
         public NotificacaoDominioHandler()
@@ -12,8 +13,7 @@ namespace Mottu.Locacao.Motos.Domain.Notification
             => _notifications.Add(new NotificacaoDominio(key, message));
 
         public bool ExisteNotificacao()
-            => _notifications.Any();     
-        
+            => _notifications.Any();             
 
         public string RecuperarNotificacoes()
             =>  JsonConvert.SerializeObject(_notifications!.ToDictionary(n => n.Chave, n => n.Mensagem));        

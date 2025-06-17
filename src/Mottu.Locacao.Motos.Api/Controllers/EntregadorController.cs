@@ -1,57 +1,55 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Mottu.Locacao.Motos.Api.Response;
+using Mottu.Locacao.Motos.Api.RoleFilter;
 using Mottu.Locacao.Motos.Domain.Dtos;
-using Mottu.Locacao.Motos.Domain.Interface.Application;
-using Mottu.Locacao.Motos.Domain.Notification;
+using Mottu.Locacao.Motos.Domain.Interface.Service;
 using Newtonsoft.Json;
 using System.Net;
 
 namespace Mottu.Locacao.Motos.Api.Controllers
 {
+    [Authorize]
     [Route("api/entregadores")]
     [ApiController]
-    public class EntregadorController : ControllerBase
+    public class EntregadorController : BaseController
     {
-
-        public readonly IMotoService _motoService;
+        public readonly IEntregadorService _entregadorService;
         public readonly ILogger<EntregadorController> _logger;
-        private readonly NotificacaoDominioHandler _notificationHandler;
+        private readonly INotificacaoDominioHandler _notificationHandler;
 
-        public EntregadorController(IMotoService motoService, ILogger<EntregadorController> logger, NotificacaoDominioHandler dominioHandler)
+        public EntregadorController(IEntregadorService entregadorService, ILogger<EntregadorController> logger, INotificacaoDominioHandler dominioHandler)
         {
-            _motoService = motoService;
+            _entregadorService = entregadorService;
             _logger = logger;
             _notificationHandler = dominioHandler;
         }
 
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [RoleAuthorizer(roles: ["Entregador"])]
         [HttpPost]
         public async Task<IActionResult> Inserir([FromBody] EntregadorDto entregadotDto, CancellationToken cancellation)
         {
             var validationResult = new EntregadorDtoValidation().Validate(entregadotDto);
 
             if (!validationResult.IsValid)
-                return BadRequest(new ResponseRequest(HttpStatusCode.BadRequest.GetHashCode(), validationResult.IsValid, null, validationResult.Errors.Select(er => er.ErrorMessage)));
+                return BadRequestResponse(validationResult.Errors.Select(er => er.ErrorMessage));
 
-            //var dadoEntrada = JsonConvert.SerializeObject(entregadotDto);
+            var dadoEntrada = JsonConvert.SerializeObject(entregadotDto);
 
-            //_logger.LogInformation(string.Format("MotoController InserirDado : Request {0}", dadoEntrada));
+            _logger.LogInformation(string.Format("EntregadorController Inserir : Request {0}", dadoEntrada));
 
-            //await _motoService.Inserir(entregadotDto, cancellation);
+            await _entregadorService.Inserir(entregadotDto, cancellation);
 
-            //if (_notificationHandler.ExisteNotificacao())
-            //{
-            //    _logger.LogInformation(string.Format("Moto Controller InserirDado : Não processado {0}",
-            //        _notificationHandler.RecuperarNotificacoes()));
+            if (_notificationHandler.ExisteNotificacao())
+            {
+                _logger.LogInformation(_notificationHandler.RecuperarNotificacoes());
 
-            //    return UnprocessableEntity(new ResponseRequest(HttpStatusCode.UnprocessableEntity.GetHashCode(),
-            //        false, null, _notificationHandler.RecuperarListaNotificacoes()));
-            //}
+                return UnprocessableEntity(_notificationHandler.RecuperarListaNotificacoes());
+            }
 
-            //_logger.LogInformation(string.Format("MotoController InserirDados : Sucesso"));
-            return Created();
+            _logger.LogInformation(string.Format("EntregadorController Inserir : Sucesso"));
+            return CreatedResponse();
         }
     }
 }

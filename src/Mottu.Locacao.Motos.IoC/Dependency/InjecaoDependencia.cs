@@ -17,7 +17,13 @@ namespace Mottu.Locacao.Motos.IoC.Dependency
         {  
             services.AddScoped<IMotoService, MotoService>();
             services.AddScoped<IRabbitService, RabbitService>();
+            services.AddScoped<IEntregadorService, EntregadorService>();
+            services.AddScoped<ILocacaoService, LocacaoService>();
+            services.AddScoped<INotificacaoDominioHandler, NotificacaoDominioHandler>();
+
             services.AddScoped<IMotoRepository, MotoRepository>();
+            services.AddScoped<IEntregadorRepository, EntregadorRepository>();
+            services.AddScoped<ILocacaoRepository, LocacaoRepository>();
 
             services.AddScoped<IDbConnection>(sp =>
             {
@@ -25,8 +31,6 @@ namespace Mottu.Locacao.Motos.IoC.Dependency
                 var connectionString = config.GetConnectionString("PostgreDB");
                 return new NpgsqlConnection(connectionString);
             });
-
-            services.AddScoped<NotificacaoDominioHandler>();
 
             return services;
         }

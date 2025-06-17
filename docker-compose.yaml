@@ -1,0 +1,64 @@
+﻿version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbit-mottu
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:14
+    container_name: postgres-mottu    
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: DESAFIO_MOTTU
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Mount init script
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U youruser -d yourdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    container_name: mottu-api-desafio-dev
+    build:
+      context: .
+      dockerfile: src/Mottu.Locacao.Motos.Api/Dockerfile
+    ports:
+      - 5000:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__PostgreDB:"Host=postgres-mottu;Port=5432;Database=DESAFIO_MOTTU;Username=admin;Password=admin123"
+      - RabbitMQSettings__Host:rabbit-mottu
+      - RabbitMQSettings__Username:admin
+      - RabbitMQSettings__Password:admin123
+      - RabbitMQSettings__QueueName:registro-moto-ano-2024
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
