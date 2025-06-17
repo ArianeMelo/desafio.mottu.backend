@@ -16,13 +16,13 @@ namespace Mottu.Locacao.Motos.Domain.Dtos
         public string Cnpj { get; set; } = string.Empty;
 
         [JsonProperty("data_nascimento")]
-        public string DataNascimento { get; set; } = string.Empty;
+        public DateTime DataNascimento { get; set; }
 
         [JsonProperty("numero_cnh")]
         public string NumeroCnh { get; set; } = string.Empty;
 
         [JsonProperty("tipo_cnh")]
-        public string TipoCnh { get; set; } = string.Empty;
+        public CategoriaCnh TipoCnh { get; set; }
 
         [JsonProperty("imagem_cnh")]
         public string ImagemCnh { get; set; } = string.Empty;
@@ -33,13 +33,31 @@ namespace Mottu.Locacao.Motos.Domain.Dtos
     {
         public EntregadorDtoValidation()
         {
-            RuleFor(dto => dto.Cnpj)
-               .NotEmpty().NotNull()
-               .WithMessage("{Propertyname}. Informar dado válido");
+            RuleFor(dto => dto.Nome)
+                .NotEmpty().NotNull()
+                .WithMessage("{PropertyName} inválido");
 
-            RuleFor(dto => dto.TipoCnh)
-                .IsInEnum()
-                .WithMessage("{Propertyname}. Informar  válido");
+            RuleFor(dto => dto.Identificador)
+                .NotEmpty().NotNull()
+                .WithMessage("{PropertyName}. Informar válido");
+
+            RuleFor(dto => dto.Cnpj)
+                .NotEmpty().NotNull()
+                .WithMessage("{PropertyName}. Informar dado válido");
+
+            RuleFor(dto => dto.DataNascimento)
+                .GreaterThan(new DateTime(1900, 01, 01))
+                .LessThanOrEqualTo(DateTime.Now)
+                .WithMessage("{PropertyName} deve ser menor que a data atual");
+
+            RuleFor(dto => dto.NumeroCnh)
+                .NotEmpty().NotNull()
+                .WithMessage("{PropertyName}. Informar dado válido");
+
+            RuleFor(dto => dto.ImagemCnh)
+                .NotEmpty().NotNull()
+                .WithMessage("{PropertyName}. Informar dado válido");
         }
+       
     }
 }

@@ -4,7 +4,7 @@ namespace Mottu.Locacao.Motos.Api.Response
 {
     public class ResponseRequest
     {
-        [JsonProperty("status_cod")]
+        [JsonProperty("status_code")]
         public int StatusCode { get; set; }
 
         [JsonProperty("sucesso")]

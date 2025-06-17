@@ -4,9 +4,9 @@ namespace Mottu.Locacao.Motos.Domain.Interface.Service
 {
     public interface ILocacaoService
     {
-        public void AlugarMoto(LocacaoDto locacaoDto);
-        public void ConsultarLocacao(string id);
-        public void InformarDataDevolucao(string id, DateTime dataDevolucao);
+        public Task Inserir(LocacaoRequestDto locacaoDto, CancellationToken cancellationToken);
+        public Task<LocacaoResponseDto> ObterLocacao(string entregadorId, CancellationToken cancellationToken);
+        public Task AtualizarLocacao(string id, DevolucaoDto dataDevolução, CancellationToken cancellationToken);
 
     }
 }

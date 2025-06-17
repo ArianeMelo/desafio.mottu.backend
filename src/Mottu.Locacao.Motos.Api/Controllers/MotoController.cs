@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Mottu.Locacao.Motos.Api.Response;
-using Mottu.Locacao.Motos.Application.Service;
 using Mottu.Locacao.Motos.Domain.Dtos;
 using Mottu.Locacao.Motos.Domain.Interface.Application;
-using Mottu.Locacao.Motos.Domain.Notification;
+using Mottu.Locacao.Motos.Domain.Interface.Service;
 using Newtonsoft.Json;
 using System.Net;
 
@@ -12,13 +10,13 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 {
     [Route("api/motos")]
     [ApiController]
-    public class MotoController : ControllerBase
+    public class MotoController : BaseController
     {
         public readonly IMotoService _motoService;
         public readonly ILogger<MotoController> _logger;
-        private readonly NotificacaoDominioHandler _notificationHandler;
+        private readonly INotificacaoDominioHandler _notificationHandler;
 
-        public MotoController(IMotoService motoService, ILogger<MotoController> logger, NotificacaoDominioHandler dominioHandler)
+        public MotoController(IMotoService motoService, ILogger<MotoController> logger, INotificacaoDominioHandler dominioHandler)
         {
             _motoService = motoService;
             _logger = logger;
@@ -33,7 +31,7 @@ namespace Mottu.Locacao.Motos.Api.Controllers
             var validationResult = new MotoDtoValidator().Validate(motoDto);
 
             if (!validationResult.IsValid)
-                return BadRequest(new ResponseRequest(HttpStatusCode.BadRequest.GetHashCode(), validationResult.IsValid, null, validationResult.Errors.Select(er => er.ErrorMessage)));
+                return BadRequestResponse(validationResult.Errors.Select(er => er.ErrorMessage));
 
             var dadoEntrada = JsonConvert.SerializeObject(motoDto);
 
@@ -43,15 +41,13 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 
             if (_notificationHandler.ExisteNotificacao())
             {
-                _logger.LogInformation(string.Format("Moto Controller InserirDado : Não processado {0}",
-                    _notificationHandler.RecuperarNotificacoes()));
+                _logger.LogInformation(_notificationHandler.RecuperarNotificacoes());
 
-                return UnprocessableEntity(new ResponseRequest(HttpStatusCode.UnprocessableEntity.GetHashCode(),
-                    false, null, _notificationHandler.RecuperarListaNotificacoes()));
+                return UnprocessableEntityErrorResponse(_notificationHandler.RecuperarListaNotificacoes());
             }
 
             _logger.LogInformation(string.Format("MotoController InserirDados : Sucesso"));
-            return Created();
+            return CreatedResponse();
         }
 
         [ProducesResponseType((int)HttpStatusCode.OK)]
@@ -59,10 +55,6 @@ namespace Mottu.Locacao.Motos.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> ObterPorPlaca([FromQuery] string placa, CancellationToken cancellation)
         {
-
-            if (string.IsNullOrEmpty(placa))
-                return BadRequest(new ResponseRequest(HttpStatusCode.BadRequest.GetHashCode(), false, null, new[] { "" }));
-
             _logger.LogInformation(string.Format("MotoController ObterPorPlaca : Request {0}", placa));
 
             var motoDto = await _motoService.ObterPorPlaca(placa, cancellation);
@@ -71,24 +63,24 @@ namespace Mottu.Locacao.Motos.Api.Controllers
             {
                 _logger.LogInformation(_notificationHandler.RecuperarNotificacoes());
 
-                return NotFound(new ResponseRequest(HttpStatusCode.NotFound.GetHashCode(), false, null, _notificationHandler.RecuperarListaNotificacoes()));
+                return NotFoundResponse(_notificationHandler.RecuperarListaNotificacoes());
             }
 
             _logger.LogInformation(string.Format("MotoController ObterPorPlaca : Response {0}", JsonConvert.SerializeObject(motoDto)));
 
-            return Ok(new ResponseRequest(HttpStatusCode.OK.GetHashCode(), true, motoDto, new[] { "" }));
+            return OkResponse(motoDto);
         }
 
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
         [HttpPut("{id}/placa")]
-        public async Task<IActionResult> AtualizarPlaca(string id, [FromBody] PlacaMotoDto placaDto, CancellationToken cancellation)
+        public async Task<IActionResult> AtualizarPlaca(string id, [FromBody] PlacaDto placaDto, CancellationToken cancellation)
         {
 
             var validationResult = new PlacaMotoDtoValidator().Validate(placaDto);
 
             if (!validationResult.IsValid)
-                return BadRequest(new ResponseRequest(HttpStatusCode.BadRequest.GetHashCode(), validationResult.IsValid, null, validationResult.Errors.Select(er => er.ErrorMessage)));
+                return BadRequestResponse(validationResult.Errors.Select(er => er.ErrorMessage));
 
             _logger.LogInformation(string.Format("MotoController AtualizarPlaca : Request Id {0} - Placa {1}", id, placaDto.Placa));
 
@@ -98,13 +90,12 @@ namespace Mottu.Locacao.Motos.Api.Controllers
             {
                 _logger.LogInformation(_notificationHandler.RecuperarNotificacoes());
 
-                return NotFound(new ResponseRequest(HttpStatusCode.NotFound.GetHashCode(), false, null, _notificationHandler.RecuperarListaNotificacoes()));
+                return NotFoundResponse(_notificationHandler.RecuperarListaNotificacoes());
             }
-
 
             _logger.LogInformation(string.Format("MotoController AtualizarPlaca : Sucesso"));
 
-            return Ok(new ResponseRequest(HttpStatusCode.OK.GetHashCode(), true, "Placa modificada com sucesso", new[] { "" }));
+            return OkResponse("Placa modificada com sucesso");
 
         }
 
@@ -113,7 +104,6 @@ namespace Mottu.Locacao.Motos.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterPorId(string id, CancellationToken cancellation)
         {
-
             _logger.LogInformation(string.Format("MotoController ObterPorId : Request {0}", id));
 
             var motoDto = await _motoService.ObterPorIdentificador(id, cancellation);
@@ -122,20 +112,30 @@ namespace Mottu.Locacao.Motos.Api.Controllers
             {
                 _logger.LogInformation(_notificationHandler.RecuperarNotificacoes());
 
-                return NotFound(new ResponseRequest(HttpStatusCode.NotFound.GetHashCode(), false, null, _notificationHandler.RecuperarListaNotificacoes()));
+                return NotFoundResponse(_notificationHandler.RecuperarListaNotificacoes());
             }
             _logger.LogInformation(string.Format("MotoController ObterPorId : Response {0}", JsonConvert.SerializeObject(motoDto)));
 
-            return Ok(new ResponseRequest(HttpStatusCode.OK.GetHashCode(), true, motoDto, new[] { "" }));
+            return OkResponse(motoDto);
         }
 
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Cancelar(string id, CancellationToken cancellation)
+        public async Task<IActionResult> Remover(string id, CancellationToken cancellation)
         {
+            _logger.LogInformation(string.Format("MotoController Remover : Request {0}", id));
 
-            return Ok();
+            await _motoService.Remover(id, cancellation);
+
+            if (_notificationHandler.ExisteNotificacao())
+            {
+                _logger.LogInformation(_notificationHandler.RecuperarNotificacoes());
+
+                return BadRequestResponse(_notificationHandler.RecuperarListaNotificacoes());
+            }
+
+            return OkResponse("Registro removido com sucesso");
         }
     }
 }

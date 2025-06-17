@@ -2,12 +2,12 @@
 
 namespace Mottu.Locacao.Motos.Domain.Dtos
 {
-    public class PlacaMotoDto
+    public class PlacaDto
     {
         public string Placa { get; set; }
     }
 
-    public class PlacaMotoDtoValidator : AbstractValidator<PlacaMotoDto>
+    public class PlacaMotoDtoValidator : AbstractValidator<PlacaDto>
     {
         const string MensagemErro = "Digite um valor válido";
         public PlacaMotoDtoValidator()

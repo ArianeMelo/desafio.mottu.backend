@@ -9,10 +9,11 @@ namespace Mottu.Locacao.Motos.Domain.Interface.Repository
         public Task<string?> ObterPlaca(string placa, CancellationToken cancellation);
         Task<Moto?> ObterPorIdentificador(string identificador, CancellationToken cancellation);
         public Task<bool> AlterarPlaca(string placa, string identificador, CancellationToken cancellation);
+        public Task Remover(string identificador, CancellationToken cancellation);
 
         #region Ano2024
         Task<string?> ObterPlacaAnoEspecifico(string placa, CancellationToken cancellation);
-        Task InserirMotoAnoEspecifico(string placa, int ano, CancellationToken cancellation);
+        Task InserirPlaca(string placa, int ano, CancellationToken cancellation);
         #endregion
 
     }

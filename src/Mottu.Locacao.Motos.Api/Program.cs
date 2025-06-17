@@ -2,12 +2,16 @@ using Mottu.Locacao.Motos.Api.Consumer;
 using Mottu.Locacao.Motos.Api.Middleware;
 using Mottu.Locacao.Motos.Application.Configuration;
 using Mottu.Locacao.Motos.IoC.Dependency;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
     .AddControllers()
-    .AddNewtonsoftJson();
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Converters.Add(new StringEnumConverter());
+    });
 
 builder.Services
     .RegistrarDependencias()

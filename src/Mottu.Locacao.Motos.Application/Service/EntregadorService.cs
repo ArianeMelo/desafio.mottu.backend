@@ -1,39 +1,48 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mottu.Locacao.Motos.Application.Extensions;
+using Mottu.Locacao.Motos.Domain.Dtos;
+using Mottu.Locacao.Motos.Domain.Interface.Repository;
+using Mottu.Locacao.Motos.Domain.Interface.Service;
 
 namespace Mottu.Locacao.Motos.Application.Service
 {
-    public class EntregadorService
+    public class EntregadorService : IEntregadorService
     {
-        private readonly string _cnhFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "cnh");
-        public EntregadorService()
+        private readonly string _cnhFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CNH");
+
+        private readonly IEntregadorRepository _entregadorRepository;
+        private readonly INotificacaoDominioHandler _notificationHandler;
+        public EntregadorService(
+            IEntregadorRepository entregadorRepository,
+            INotificacaoDominioHandler notificationHandler)
         {
             if (!Directory.Exists(_cnhFolder))
                 Directory.CreateDirectory(_cnhFolder);
+
+            _entregadorRepository = entregadorRepository;
+            _notificationHandler = notificationHandler;
         }
 
-        public async Task<string> SalvarCnhAsync(IFormFile arquivo)
+        public async Task Inserir(EntregadorDto entregadorDto, CancellationToken cancellationToken)
         {
-            var extensao = Path.GetExtension(arquivo.FileName).ToLower();
+            var cnpj = await _entregadorRepository.ObterPorCnpj(entregadorDto.Cnpj, cancellationToken);
 
-            if (extensao != ".png" && extensao != ".bmp")
-                throw new InvalidDataException("Somente arquivos PNG ou BMP são permitidos.");
-
-            var nomeArquivo = $"{Guid.NewGuid()}{extensao}";
-            var caminhoCompleto = Path.Combine(_cnhFolder, nomeArquivo);
-
-            using (var stream = new FileStream(caminhoCompleto, FileMode.Create))
+            if (cnpj is not null)
             {
-                await arquivo.CopyToAsync(stream);
+                _notificationHandler.AdicionarNotificacao("EntregadorService Inserir", string.Format("Já existe um registro para cnpj informado {0}", entregadorDto.Cnpj));
+                return;
             }
 
-            // Retorna URL relativa para acesso
-            var urlRelativa = $"/cnh/{nomeArquivo}";
-            return urlRelativa;
+            var numeroCnh = await _entregadorRepository.ObterPorIdEntregador(entregadorDto.Identificador, cancellationToken);
+            if (numeroCnh is not null)
+            {
+                _notificationHandler.AdicionarNotificacao("EntregadorService Inserir", string.Format("Já existe registro de entregador {0} para a CNH informada {1}", entregadorDto.Identificador, numeroCnh.NumeroCnh));
+                return;
+            }
+            
+            await _entregadorRepository.Inserir(entregadorDto?.ParaDominio(), cancellationToken);
+
+            var salvouMensagem = await EntregadorExtensions.SalvarImagemCnh(entregadorDto.ImagemCnh, entregadorDto.Cnpj, _cnhFolder);
         }
     }
 }

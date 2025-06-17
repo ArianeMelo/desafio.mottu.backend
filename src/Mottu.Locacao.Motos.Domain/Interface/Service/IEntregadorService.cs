@@ -2,9 +2,8 @@
 
 namespace Mottu.Locacao.Motos.Domain.Interface.Service
 {
-    internal interface IEntregadorService
+    public interface IEntregadorService
     {
-        public void CriarCadastro(EntregadorDto entregadorDto);
-        public void AlterarFoto(string id, string imagemCnh);
+        public Task Inserir(EntregadorDto entregadorDto, CancellationToken cancellationToken);      
     }
 }

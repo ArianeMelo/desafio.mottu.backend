@@ -2,8 +2,8 @@
 {
     public enum CategoriaCnh
     {
-       CategoriaA = 4,
-       CategoriaB,
-       CategoriaAB,
+        A = 1,
+        B,
+        AB
     }
 }

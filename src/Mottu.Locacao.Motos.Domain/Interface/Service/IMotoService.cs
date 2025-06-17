@@ -8,6 +8,7 @@ namespace Mottu.Locacao.Motos.Domain.Interface.Application
         public Task<MotoDto?> ObterPorPlaca(string placa, CancellationToken cancellation);
         public Task<bool> AlterarPlaca(string placa, string id, CancellationToken cancellation);
         Task<MotoDto?> ObterPorIdentificador(string identificador, CancellationToken cancellation);
+        Task Remover(string identificador, CancellationToken cancellation);
 
         Task InserirAnoEspecifico(string placa, int ano, CancellationToken cancellation);
     }

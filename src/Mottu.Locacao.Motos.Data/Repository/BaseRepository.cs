@@ -2,7 +2,7 @@
 using Npgsql;
 using System.Data;
 
-namespace Mottu.Locacao.Motos.Domain.Interface.Repository
+namespace Mottu.Locacao.Motos.Data.Repository
 {
     public abstract class BaseRepository(IDbConnection connection)
     {
@@ -38,6 +38,16 @@ namespace Mottu.Locacao.Motos.Domain.Interface.Repository
                     .WaitAsync(cancellation);
 
                 return alterado > 0;
+            }
+        }
+
+        public async Task Remover(string sql, DynamicParameters? parameters, CancellationToken cancellation)
+        {
+            using (var conn = new NpgsqlConnection(_connection.ConnectionString))
+            {
+                await conn
+                     .ExecuteAsync(sql, parameters)
+                     .WaitAsync(cancellation);
             }
         }
     }
