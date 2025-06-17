@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Mottu.Locacao.Motos.Api.Response;
+using Mottu.Locacao.Motos.Api.RoleFilter;
 using Mottu.Locacao.Motos.Domain.Dtos;
 using Mottu.Locacao.Motos.Domain.Interface.Application;
 using Mottu.Locacao.Motos.Domain.Interface.Service;
@@ -8,6 +10,7 @@ using System.Net;
 
 namespace Mottu.Locacao.Motos.Api.Controllers
 {
+    [Authorize]
     [Route("api/motos")]
     [ApiController]
     public class MotoController : BaseController
@@ -25,6 +28,7 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [RoleAuthorizer(roles: ["Admin"])]
         [HttpPost]
         public async Task<IActionResult> Inserir([FromBody] MotoDto motoDto, CancellationToken cancellation)
         {
@@ -51,7 +55,8 @@ namespace Mottu.Locacao.Motos.Api.Controllers
         }
 
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [RoleAuthorizer(roles: ["Admin"])]
         [HttpGet]
         public async Task<IActionResult> ObterPorPlaca([FromQuery] string placa, CancellationToken cancellation)
         {
@@ -73,6 +78,7 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [RoleAuthorizer(roles: ["Admin"])]
         [HttpPut("{id}/placa")]
         public async Task<IActionResult> AtualizarPlaca(string id, [FromBody] PlacaDto placaDto, CancellationToken cancellation)
         {
@@ -121,6 +127,7 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [RoleAuthorizer(roles: ["Admin"])]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remover(string id, CancellationToken cancellation)
         {

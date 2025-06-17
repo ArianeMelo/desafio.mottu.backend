@@ -1,40 +1,66 @@
-﻿# Mottu.Locacao.Motos
+﻿# 📦 Mottu Locação de Motos - API
 
-Este projeto faz o gerenciamento de locações e cadastros de veículos.
+Este projeto contém uma API desenvolvida em .NET 9, utilizando PostgreSQL como banco de dados e RabbitMQ para mensageria, todos orquestrados via Docker Compose.
 
-Tecnologias utilizadas: .NE 9, Dapper, PostgreSQL, RabbitMQ.
+---
 
-✅ Pré-requisitos
-- Docker instalado
-- PowerShell (ou outro terminal)
+## 🧱 Tecnologias Utilizadas
 
-🚀 Subindo o ambiente
-1. Abra o PowerShell na raiz do projeto
+- ASP.NET Core 9
+- Docker & Docker Compose
+- PostgreSQL 14
+- RabbitMQ 3.13 Management
+- Swagger (via Swashbuckle)
 
-OBS: Pode Forçar remoção dos volumes (opcional, mas recomendado na 1ª vez)
-powershell > Copiar > Colar :
-docker-compose down -v
- 
-2. Subir os containers
-powershell > Copiar > Colar : 
+---
+
+## ⚙️ Pré-requisitos
+
+Certifique-se de que os seguintes itens estejam instalados na sua máquina:
+
+- [Docker](https://www.docker.com/products/docker-desktop)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+---
+
+## 🚀 Como executar o projeto
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/seu-usuario/mottu-locacao-motos.git
+cd mottu-locacao-motos
+
+2. Suba os containers com Docker Compose
+bash
 docker-compose up --build
+Aguarde até que todos os containers estejam executando.
 
-Esse comando:
--Sobe o RabbitMQ
--Sobe o PostgreSQL
--Executa os scripts de banco (init.sql)
--Sobe a API ASP.NET Core
+🔍 Acessando a API
+Depois que os serviços estiverem em execução, acesse o Swagger UI em:
 
-🔍 Acessos e credenciais
-Serviço	URL / Porta	Acesso
-API	http://localhost:5000	—
-RabbitMQ	http://localhost:15672	admin / admin
-PostgreSQL	localhost:5432	admin / admin123 (via app)
+📍 http://localhost:5000/swagger
 
 
-🧾 Observações finais
-O arquivo init.sql roda automaticamente na primeira criação do container PostgreSQL.
+---
 
-Se precisar reexecutar os scripts, use docker-compose down -v.
+API REST para gerenciamento de locações de motos, entregadores, autenticação e controle de veículos.
 
-A aplicação só sobe após banco e Rabbit estarem prontos, garantindo a ordem correta.
+## 🔐 Autenticação
+
+### `POST /api/auth/logar`
+Autentica um usuário.
+
+- **Body**: `UsuarioDto`
+  - `email`: string
+  - `perfil`: `Admin` | `Entregador`
+
+- **Respostas**:
+  - `200 OK`
+  - `400 Bad Request`
+
+  ## 🔒 Autenticação 
+
+- Utilizar token JWT no cabeçalho usando a palavra 'BEARER" antes do token
+
+-

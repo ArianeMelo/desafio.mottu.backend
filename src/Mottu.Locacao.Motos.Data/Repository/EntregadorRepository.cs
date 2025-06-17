@@ -40,7 +40,7 @@ namespace Mottu.Locacao.Motos.Data.Repository
             return await base.ObterPorFiltro<Entregador?>(EntregadorQuery.ObterCnpj, param, cancellation);
         }
 
-        public async Task<Entregador?> ObterPorIdEntregador(string identificador, CancellationToken cancellation)
+        public async Task<Entregador?> ObterEntregadorPorId(string identificador, CancellationToken cancellation)
         {
             var param = new DynamicParameters();
             param.Add("@Identificador", identificador, DbType.AnsiString);

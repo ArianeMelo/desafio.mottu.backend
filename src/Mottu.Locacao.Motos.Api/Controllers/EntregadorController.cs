@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Mottu.Locacao.Motos.Api.RoleFilter;
 using Mottu.Locacao.Motos.Domain.Dtos;
 using Mottu.Locacao.Motos.Domain.Interface.Service;
 using Newtonsoft.Json;
@@ -6,6 +8,7 @@ using System.Net;
 
 namespace Mottu.Locacao.Motos.Api.Controllers
 {
+    [Authorize]
     [Route("api/entregadores")]
     [ApiController]
     public class EntregadorController : BaseController
@@ -23,6 +26,7 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [RoleAuthorizer(roles: ["Entregador"])]
         [HttpPost]
         public async Task<IActionResult> Inserir([FromBody] EntregadorDto entregadotDto, CancellationToken cancellation)
         {

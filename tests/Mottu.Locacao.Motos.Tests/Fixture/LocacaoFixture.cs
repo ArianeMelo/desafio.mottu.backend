@@ -12,48 +12,49 @@ public class LocacaoServiceFixture
     public Mock<ILocacaoRepository> LocacaoRepositoryMock { get; private set; }
     public Mock<IEntregadorRepository> EntregadorRepositoryMock { get; private set; }
     public Mock<INotificacaoDominioHandler> NotificacaoHandlerMock { get; private set; }
-    public LocacaoService Service { get; private set; }
-
-    public LocacaoServiceFixture()
+    public LocacaoService Setup()
     {
         LocacaoRepositoryMock = new Mock<ILocacaoRepository>();
         EntregadorRepositoryMock = new Mock<IEntregadorRepository>();
         NotificacaoHandlerMock = new Mock<INotificacaoDominioHandler>();
 
-        Service = new LocacaoService(
+        return new LocacaoService(
             LocacaoRepositoryMock.Object,
             EntregadorRepositoryMock.Object,
             NotificacaoHandlerMock.Object
         );
     }
 
-    public LocacaoRequestDto CriarLocacaoRequest()
+    public LocacaoRequestDto CriarLocacaoRequestDto()
     {
         return new LocacaoRequestDto
         {
-            EntregadorId = Guid.NewGuid().ToString(),
-            MotoId = Guid.NewGuid().ToString(),
-            PlanoLocacao = 1
+            EntregadorId = "Entregador123",
+            MotoId = "Moto123",
+            PlanoLocacao = 1,        
+            DataInicio = DateTime.Today
         };
     }
 
     public Entregador CriarEntregadorValido()
-    {
-        return new Entregador
+        => new Entregador
         {
-            Identificador = "EntregadorId",
+            Identificador = "Entregador123",
             TipoCnh = 1, // Categoria Cnh A
         };
-    }
 
-    public LocacaoEntity CriarLocacaoDominio()
-    {
-        return new LocacaoEntity
+    public LocacaoEntity CriarLocacaoEntity()
+        => new LocacaoEntity
         {
             EntregadorId = "Entregador123",
             MotoId = "moto123",
             DataInicio = DateTime.Today,
-            PlanoLocacao = 1
+            PlanoLocacao = 7 //Numero de dias referente ao plano de locação
         };
-    }
+
+    public DevolucaoDto CriarDevolucaoDto(DateTime time)
+        => new DevolucaoDto
+        {
+            DataDevolucao = time.Date
+        };
 }

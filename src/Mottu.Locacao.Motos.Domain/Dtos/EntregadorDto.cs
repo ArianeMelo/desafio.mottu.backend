@@ -58,6 +58,6 @@ namespace Mottu.Locacao.Motos.Domain.Dtos
                 .NotEmpty().NotNull()
                 .WithMessage("{PropertyName}. Informar dado válido");
         }
-       
+
     }
 }

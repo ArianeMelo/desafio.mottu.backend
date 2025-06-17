@@ -10,7 +10,7 @@ namespace Mottu.Locacao.Motos.Data.Repository
     {
         public LocacaoRepository(IDbConnection connection) : base(connection)
         { }
-        public async Task InserirLocacao(LocacaoEntity locacao, CancellationToken cancellation)
+        public async Task Inserir(LocacaoEntity locacao, CancellationToken cancellation)
         {
             var param = new DynamicParameters();
             param.Add(@"Id", locacao.Id, DbType.Guid);
@@ -25,7 +25,7 @@ namespace Mottu.Locacao.Motos.Data.Repository
             await base.Inserir(LocacaoQuery.Inserir, param, cancellation);
         }
 
-        public async Task<LocacaoEntity?> ObterLocacao(string entregadorId, CancellationToken cancellation)
+        public async Task<LocacaoEntity?> ObterLocacaoCompletaPorIdEntregador(string entregadorId, CancellationToken cancellation)
         {
             var param = new DynamicParameters();
             param.Add("@EntregadorId", entregadorId, DbType.AnsiString);
@@ -33,7 +33,7 @@ namespace Mottu.Locacao.Motos.Data.Repository
             return await base.ObterPorFiltro<LocacaoEntity?>(LocacaoQuery.ObterLocacao, param, cancellation);
         }
 
-        public async Task<LocacaoEntity?> ObterPorId(string entregadorId, CancellationToken cancellation)
+        public async Task<LocacaoEntity?> ObterLocacaoPorIdEntregador(string entregadorId, CancellationToken cancellation)
         {
             var param = new DynamicParameters();
             param.Add("@EntregadorId", entregadorId, DbType.AnsiString);

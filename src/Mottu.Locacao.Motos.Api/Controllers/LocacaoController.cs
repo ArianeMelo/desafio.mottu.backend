@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Mottu.Locacao.Motos.Api.Response;
+using Mottu.Locacao.Motos.Api.RoleFilter;
 using Mottu.Locacao.Motos.Domain.Dtos;
 using Mottu.Locacao.Motos.Domain.Interface.Service;
 using Newtonsoft.Json;
@@ -26,6 +27,7 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
+        [RoleAuthorizer(roles: ["Entregador"])]
         [HttpPost]
         public async Task<IActionResult> Inserir([FromBody] LocacaoRequestDto locacaorequest, CancellationToken cancellation)
         {
@@ -74,6 +76,7 @@ namespace Mottu.Locacao.Motos.Api.Controllers
 
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.NotFound)]
+        [RoleAuthorizer(roles: ["Entregador"])]
 
         [HttpPut("{entregadorId}")]
         public async Task<IActionResult> InserirDataDevolucao(string entregadorId, [FromBody] DevolucaoDto dto, CancellationToken cancellation)

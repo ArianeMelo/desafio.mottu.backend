@@ -33,7 +33,7 @@ namespace Mottu.Locacao.Motos.Application.Service
                 return;
             }
 
-            var numeroCnh = await _entregadorRepository.ObterPorIdEntregador(entregadorDto.Identificador, cancellationToken);
+            var numeroCnh = await _entregadorRepository.ObterEntregadorPorId(entregadorDto.Identificador, cancellationToken);
             if (numeroCnh is not null)
             {
                 _notificationHandler.AdicionarNotificacao("EntregadorService Inserir", string.Format("Já existe registro de entregador {0} para a CNH informada {1}", entregadorDto.Identificador, numeroCnh.NumeroCnh));

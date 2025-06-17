@@ -23,7 +23,7 @@ namespace Mottu.Locacao.Motos.Application.Service
 
         public async Task Inserir(LocacaoRequestDto locacaoDto, CancellationToken cancellationToken)
         {
-            var locacaoObtida = await _locacaoRepository.ObterPorId(locacaoDto.EntregadorId, cancellationToken);
+            var locacaoObtida = await _locacaoRepository.ObterLocacaoPorIdEntregador(locacaoDto.EntregadorId, cancellationToken);
 
             if (locacaoObtida is not null)
             {
@@ -31,7 +31,7 @@ namespace Mottu.Locacao.Motos.Application.Service
                 return;
             }
 
-            var entregador = await _entregadorRepository.ObterPorIdEntregador(locacaoDto.EntregadorId, cancellationToken);
+            var entregador = await _entregadorRepository.ObterEntregadorPorId(locacaoDto.EntregadorId, cancellationToken);
 
             if (entregador is null)
             {
@@ -47,12 +47,12 @@ namespace Mottu.Locacao.Motos.Application.Service
 
             var locacao = locacaoDto.ParaDominio();
 
-            await _locacaoRepository.InserirLocacao(locacao, cancellationToken);
+            await _locacaoRepository.Inserir(locacao, cancellationToken);
         }
 
         public async Task<LocacaoResponseDto?> ObterLocacao(string entregadorId, CancellationToken cancellationToken)
         {
-            var locacao = await _locacaoRepository.ObterLocacao(entregadorId, cancellationToken);
+            var locacao = await _locacaoRepository.ObterLocacaoCompletaPorIdEntregador(entregadorId, cancellationToken);
 
             if (locacao is null)
             {
@@ -65,7 +65,7 @@ namespace Mottu.Locacao.Motos.Application.Service
 
         public async Task AtualizarLocacao(string entregadorId, DevolucaoDto dataDevolucao, CancellationToken cancellationToken)
         {
-            var locacao = await _locacaoRepository.ObterLocacao(entregadorId, cancellationToken);
+            var locacao = await _locacaoRepository.ObterLocacaoCompletaPorIdEntregador(entregadorId, cancellationToken);
 
             if (locacao is null)
             {
